@@ -106,13 +106,6 @@ export default function Login() {
         formData.password
       );
 
-      if (!userCred.user.emailVerified) {
-        setEmailNotVerified(true);
-        await auth.signOut();
-        setIsSubmitting(false);
-        return;
-      }
-
       setSuccess(true);
       setTimeout(() => router.replace("/dashboard"), 1500);
     } catch (err) {
@@ -121,51 +114,14 @@ export default function Login() {
     }
   };
 
-  const sendVerification = async () => {
-    setVerificationError("");
-    setVerificationSent(false);
-
-    try {
-      if (user) {
-        await sendEmailVerification(user);
-        setVerificationSent(true);
-      }
-    } catch (err) {
-      setVerificationError("Failed to send verification email.");
-    }
-  };
-
   useEffect(() => {
     const { email, password } = formData;
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@(vips\.edu|vipstc\.edu\.in)$/;
-    setFalseEmailFormat(email ? !emailRegex.test(email) : false);
-
+    
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
     setFalsePasswordFormat(password ? !passwordRegex.test(password) : false);
   }, [formData]);
-
-  const handleSignInWithGoogle = async () => {
-    setLoading(true);
-    setError("");
-
-    const provider = new GoogleAuthProvider();
-
-    try {
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
-    } catch (error: any) {
-      console.error("Google Sign-In Error:", error);
-      if (error.code === "auth/popup-closed-by-user") {
-        setError("Sign-in popup closed before completing sign-in.");
-      } else {
-        setError("Failed to sign in with Google. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -231,7 +187,7 @@ export default function Login() {
           </div>
 
           <div className="text-base sm:text-lg text-center px-4">
-            Welcome to <b>Cleit</b>, the official CDC platform of VIPS
+            Welcome to <b>Cleit Admin</b>, the official CDC platform of VIPS
           </div>
 
           {!showForgotPassword ? (
@@ -376,15 +332,6 @@ export default function Login() {
                     <path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z" />
                   </svg>
 
-                  <div className="flex text-sm flex-wrap gap-1">
-                    <span>Your email is not verified.</span>
-                    <button
-                      onClick={sendVerification}
-                      className="underline cursor-pointer"
-                    >
-                      Send Verification Email
-                    </button>
-                  </div>
                 </div>
               )}
               {verificationSent && (
@@ -396,22 +343,6 @@ export default function Login() {
               {verificationError && (
                 <div className="text-red-800 mt-1">{verificationError}</div>
               )}
-              <div className="flex w-full justify-center items-center my-4">
-                <div className="border-b border-gray-300 w-full mx-3"></div>
-                <span className="text-gray-500 text-sm whitespace-nowrap">
-                  or
-                </span>
-                <div className="border-b border-gray-300 w-full mx-3"></div>
-              </div>
-
-              <div className="flex justify-center items-center gap-3 sm:gap-4 rounded-lg transition-colors duration-200">
-                <span className="text-sm sm:text-base">
-                  Don't have an account?{" "}
-                  <span className="underline cursor-pointer">
-                    <Link href={"/auth/register"}>Create one now.</Link>
-                  </span>
-                </span>
-              </div>
             </div>
           ) : (
             <form

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   const paramsToSign: Record<string, string | number | undefined> = {
     timestamp,
-    folder: folder || "resumes",
+    folder: folder || "jobs",
     public_id: public_id || undefined,
   };
 
@@ -38,6 +38,6 @@ export async function POST(req: Request) {
     timestamp,
     signature,
     apiKey: process.env.CLOUDINARY_API_KEY,
-    folder: folder || "resumes",
+    folder: folder || "jobs",
   });
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { register } from "@/instrumentation";
-import { Job } from "../../../../db/schema";
+import { Webinar } from "../../../../db/schema";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 export async function GET(req: Request) {
@@ -15,19 +15,18 @@ export async function GET(req: Request) {
     if (!decodedToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const jobs = await Job.find().sort({ createdAt: -1 });
-    return NextResponse.json({ jobs });
+    const webinars = await Webinar.find().sort({ createdAt: -1 });
+    return NextResponse.json({ webinars });
   } catch (error) {
-    console.error("GET /api/jobs error:", error);
-    return NextResponse.json({ error: "Failed to fetch jobs" }, { status: 500 });
+    console.error("GET /api/webinars error:", error);
+    return NextResponse.json({ error: "Failed to fetch webinars" }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { newJob } = body;
-
+    const { newWebinar } = body;
     await register();
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -38,21 +37,19 @@ export async function POST(req: Request) {
     if (!decodedToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const job = new Job(newJob);
-    await job.save();
-
-    return NextResponse.json({ job }, { status: 201 });
+    const webinar = new Webinar(newWebinar);
+    await webinar.save();
+    return NextResponse.json({ webinar }, { status: 201 });
   } catch (error) {
-    console.error("POST /api/jobs error:", error);
-    return NextResponse.json({ error: "Failed to create job" }, { status: 500 });
+    console.error("POST /api/webinars error:", error);
+    return NextResponse.json({ error: "Failed to create webinar" }, { status: 500 });
   }
 }
 
 export async function PATCH(req: Request) {
   try {
     const body = await req.json();
-    const { jobId, updates } = body;
-
+    const { webinarId, updates } = body;
     await register();
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -63,24 +60,21 @@ export async function PATCH(req: Request) {
     if (!decodedToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const updatedJob = await Job.findByIdAndUpdate(jobId, updates, { new: true });
-
-    if (!updatedJob) {
-      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    const updatedWebinar = await Webinar.findByIdAndUpdate(webinarId, updates, { new: true });
+    if (!updatedWebinar) {
+      return NextResponse.json({ error: "Webinar not found" }, { status: 404 });
     }
-
-    return NextResponse.json({ job: updatedJob });
+    return NextResponse.json({ webinar: updatedWebinar });
   } catch (error) {
-    console.error("PATCH /api/jobs error:", error);
-    return NextResponse.json({ error: "Failed to update job" }, { status: 500 });
+    console.error("PATCH /api/webinars error:", error);
+    return NextResponse.json({ error: "Failed to update webinar" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: Request) {
   try {
     const body = await req.json();
-    const { jobId } = body;
-
+    const { webinarId } = body;
     await register();
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -91,15 +85,13 @@ export async function DELETE(req: Request) {
     if (!decodedToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const deletedJob = await Job.findByIdAndDelete(jobId);
-
-    if (!deletedJob) {
-      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    const deletedWebinar = await Webinar.findByIdAndDelete(webinarId);
+    if (!deletedWebinar) {
+      return NextResponse.json({ error: "Webinar not found" }, { status: 404 });
     }
-
-    return NextResponse.json({ message: "Job deleted" });
+    return NextResponse.json({ message: "Webinar deleted" });
   } catch (error) {
-    console.error("DELETE /api/jobs error:", error);
-    return NextResponse.json({ error: "Failed to delete job" }, { status: 500 });
+    console.error("DELETE /api/webinars error:", error);
+    return NextResponse.json({ error: "Failed to delete webinar" }, { status: 500 });
   }
 }
